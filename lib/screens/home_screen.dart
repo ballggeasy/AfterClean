@@ -7,6 +7,7 @@ import '../providers/recipe_provider.dart';
 import '../widgets/recipe_card.dart';
 import 'favorites_screen.dart';
 import 'detail_screen.dart';
+import 'profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -27,6 +28,16 @@ class HomeScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const FavoritesScreen()),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.person_outline_rounded),
+            tooltip: 'โปรไฟล์',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfileScreen()),
               );
             },
           ),
