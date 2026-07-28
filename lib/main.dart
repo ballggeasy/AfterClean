@@ -40,12 +40,44 @@ class RecipeApp extends StatelessWidget {
 }
 
 /// ตรวจสอบ session ที่ค้างอยู่ตอนเปิดแอป แล้วพาไปหน้าที่เหมาะสม
-class _AuthGate extends StatelessWidget {
+///
+/// นี่คือจุดเดียวที่คอย sync รายการ favorites ให้ตรงกับผู้ใช้ที่ล็อกอินอยู่:
+/// ทุกครั้งที่ auth เปลี่ยน (ล็อกอิน, สมัครสมาชิก, guest, ล็อกเอาต์, auto-login ตอนเปิดแอป)
+/// จะโหลด favorites ของ key นั้นใหม่ ป้องกันไม่ให้ favorites ของบัญชีหนึ่งไปติดกับอีกบัญชี
+class _AuthGate extends StatefulWidget {
   const _AuthGate();
+
+  @override
+  State<_AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<_AuthGate> {
+  String? _lastSyncedKey = 'unset';
+
+  void _syncFavoritesIfNeeded(AuthProvider auth) {
+    String? key;
+    if (auth.status == AuthStatus.loggedIn) {
+      key = auth.currentUser?.email;
+    } else if (auth.status == AuthStatus.guest) {
+      key = 'guest';
+    } else {
+      // unknown หรือ loggedOut ยังไม่ต้อง sync
+      return;
+    }
+
+    if (key == _lastSyncedKey) return;
+    _lastSyncedKey = key;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<RecipeProvider>().loadFavoritesForUser(key);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    _syncFavoritesIfNeeded(auth);
 
     if (auth.status == AuthStatus.unknown) {
       return Scaffold(
