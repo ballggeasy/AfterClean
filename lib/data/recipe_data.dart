@@ -1,9 +1,10 @@
 import '../models/recipe.dart';
+import 'recipe_enrichment.dart';
 
 /// ข้อมูลสูตรอาหาร mock ~16 สูตร กระจาย 5 ประเทศ (ไทย, อิตาลี, ญี่ปุ่น, จีน, เกาหลี)
 /// ผสมระหว่างสูตร "ทางการ" จากทีม และสูตรที่ผู้ใช้อัปโหลดเอง พร้อมคะแนนรีวิว mock
 class RecipeData {
-  static final List<Recipe> recipes = [
+  static final List<Recipe> _rawRecipes = [
     // ---------------- ไทย ----------------
     Recipe(
       id: '1',
@@ -497,6 +498,10 @@ class RecipeData {
       ],
     ),
   ];
+
+  /// สูตรที่ enrich แล้วพร้อม metadata เพิ่มเติม
+  static List<Recipe> get recipes =>
+      _rawRecipes.map(RecipeEnrichment.enrich).toList();
 
   static List<String> get categories {
     final cats = recipes.map((r) => r.category).toSet().toList();

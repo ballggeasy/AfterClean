@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'theme/app_theme.dart';
-import 'providers/recipe_provider.dart';
-import 'providers/auth_provider.dart';
-import 'providers/theme_provider.dart';
-import 'screens/login_screen.dart';
-import 'screens/home_screen.dart';
+import '../../theme/app_theme.dart';
+import '../../providers/recipe_provider.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/theme_provider.dart';
+import '../../providers/favorite_provider.dart';
+import '../../providers/review_provider.dart';
+import '../../providers/comment_provider.dart';
+import '../../providers/meal_planner_provider.dart';
+import '../screens/login_screen.dart';
+import '../screens/main/main_screen.dart';
 
 void main() {
   runApp(const RecipeApp());
@@ -19,9 +23,13 @@ class RecipeApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => RecipeProvider()),
+        ChangeNotifierProvider(create: (_) => RecipeProvider()..init()),
         ChangeNotifierProvider(create: (_) => AuthProvider()..init()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()..init()),
+        ChangeNotifierProvider(create: (_) => FavoriteProvider()),
+        ChangeNotifierProvider(create: (_) => ReviewProvider()),
+        ChangeNotifierProvider(create: (_) => CommentProvider()),
+        ChangeNotifierProvider(create: (_) => MealPlannerProvider()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {
@@ -39,11 +47,6 @@ class RecipeApp extends StatelessWidget {
   }
 }
 
-/// ตรวจสอบ session ที่ค้างอยู่ตอนเปิดแอป แล้วพาไปหน้าที่เหมาะสม
-///
-/// นี่คือจุดเดียวที่คอย sync รายการ favorites ให้ตรงกับผู้ใช้ที่ล็อกอินอยู่:
-/// ทุกครั้งที่ auth เปลี่ยน (ล็อกอิน, สมัครสมาชิก, guest, ล็อกเอาต์, auto-login ตอนเปิดแอป)
-/// จะโหลด favorites ของ key นั้นใหม่ ป้องกันไม่ให้ favorites ของบัญชีหนึ่งไปติดกับอีกบัญชี
 class _AuthGate extends StatefulWidget {
   const _AuthGate();
 
@@ -61,7 +64,6 @@ class _AuthGateState extends State<_AuthGate> {
     } else if (auth.status == AuthStatus.guest) {
       key = 'guest';
     } else {
-      // unknown หรือ loggedOut ยังไม่ต้อง sync
       return;
     }
 
@@ -87,7 +89,7 @@ class _AuthGateState extends State<_AuthGate> {
     }
 
     if (auth.status == AuthStatus.loggedIn || auth.status == AuthStatus.guest) {
-      return const HomeScreen();
+      return const MainScreen();
     }
 
     return const LoginScreen();

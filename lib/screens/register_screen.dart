@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../theme/app_theme.dart';
 import '../providers/auth_provider.dart';
-import 'home_screen.dart';
+import 'main/main_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -72,7 +72,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
 
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
+      MaterialPageRoute(builder: (_) => const MainScreen()),
       (route) => false,
     );
   }

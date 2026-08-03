@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../theme/app_theme.dart';
 import '../providers/auth_provider.dart';
-import 'home_screen.dart';
+import 'main/main_screen.dart';
 import 'register_screen.dart';
 import 'forgot_password_screen.dart';
 
@@ -56,14 +56,14 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
+      MaterialPageRoute(builder: (_) => const MainScreen()),
     );
   }
 
   void _loginAsGuest() {
     context.read<AuthProvider>().continueAsGuest();
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
+      MaterialPageRoute(builder: (_) => const MainScreen()),
     );
   }
 

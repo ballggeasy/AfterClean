@@ -8,6 +8,7 @@ class RatingDisplay extends StatelessWidget {
   final int reviewCount;
   final double fontSize;
   final double starSize;
+  final bool showCount;
 
   const RatingDisplay({
     super.key,
@@ -15,6 +16,7 @@ class RatingDisplay extends StatelessWidget {
     required this.reviewCount,
     this.fontSize = 12,
     this.starSize = 14,
+    this.showCount = true,
   });
 
   @override
@@ -32,14 +34,16 @@ class RatingDisplay extends StatelessWidget {
             color: AppTheme.textPrimary,
           ),
         ),
-        const SizedBox(width: 4),
-        Text(
-          '· $reviewCount รีวิว',
-          style: TextStyle(
-            fontSize: fontSize,
-            color: AppTheme.textSecondary,
+        if (showCount) ...[
+          const SizedBox(width: 4),
+          Text(
+            '· $reviewCount รีวิว',
+            style: TextStyle(
+              fontSize: fontSize,
+              color: AppTheme.textSecondary,
+            ),
           ),
-        ),
+        ],
       ],
     );
   }

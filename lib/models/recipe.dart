@@ -1,30 +1,37 @@
+import 'ingredient.dart';
+import 'nutrition.dart';
+
+/// สูตรอาหาร — โมเดลหลักของแอป
 class Recipe {
   final String id;
   final String name;
-  final String emoji; // ใช้เป็น fallback ถ้าโหลดรูปจริงไม่ได้
-  final String imageUrl; // URL รูปภาพจริงของเมนู
+  final String emoji;
+  final String imageUrl;
   final String category;
   final int cookTimeMinutes;
-  final String difficulty; // ง่าย / ปานกลาง / ยาก
+  final int prepTimeMinutes;
+  final String difficulty;
   final List<String> ingredients;
+  final List<IngredientItem> ingredientItems;
   final List<String> steps;
-
-  /// ประเทศ/ชาติของอาหาร เช่น ไทย, อิตาลี, ญี่ปุ่น
   final String country;
-
-  /// true = สูตรทางการจากทีม, false = ผู้ใช้อัปโหลดเอง
   final bool isOfficial;
-
-  /// ชื่อผู้อัปโหลด (ใช้แสดงเมื่อ isOfficial เป็น false)
   final String? uploaderName;
-
-  /// คะแนนเฉลี่ย 1.0 - 5.0
   final double rating;
-
-  /// จำนวนรีวิวทั้งหมด
   final int reviewCount;
+  final int servings;
+  final String? tips;
+  final String? platingTips;
+  final NutritionInfo? nutrition;
+  final List<String> dietTags;
+  final String season;
+  final DateTime createdAt;
+  final int viewCount;
+  final bool isRecommended;
+  final List<String> imageUrls;
+  final String? videoUrl;
 
-  const Recipe({
+  Recipe({
     required this.id,
     required this.name,
     required this.emoji,
@@ -35,25 +42,41 @@ class Recipe {
     required this.ingredients,
     required this.steps,
     required this.country,
+    this.prepTimeMinutes = 10,
+    this.ingredientItems = const [],
     this.isOfficial = true,
     this.uploaderName,
     this.rating = 0.0,
     this.reviewCount = 0,
-  });
+    this.servings = 2,
+    this.tips,
+    this.platingTips,
+    this.nutrition,
+    this.dietTags = const [],
+    this.season = 'ตลอดปี',
+    DateTime? createdAt,
+    this.viewCount = 0,
+    this.isRecommended = false,
+    List<String>? imageUrls,
+    this.videoUrl,
+  })  : createdAt = createdAt ?? DateTime(2025, 6, 1),
+        imageUrls = imageUrls ?? const [];
 
-  /// ข้อความแสดงเครดิตแหล่งที่มา เช่น "ทางการ" หรือ "โดย คุณส้ม"
-  String get sourceLabel => isOfficial ? 'สูตรทางการ' : 'โดย ${uploaderName ?? 'ผู้ใช้'}';
+  int get totalTimeMinutes => prepTimeMinutes + cookTimeMinutes;
 
-  /// ใช้ตรวจสอบว่าสูตรนี้มีวัตถุดิบที่ตรงกับคำค้นหาหรือไม่
+  List<String> get allImages =>
+      imageUrls.isNotEmpty ? imageUrls : (imageUrl.isNotEmpty ? [imageUrl] : []);
+
+  String get sourceLabel =>
+      isOfficial ? 'สูตรทางการ' : 'โดย ${uploaderName ?? 'ผู้ใช้'}';
+
   bool matchesIngredientQuery(String query) {
     if (query.trim().isEmpty) return true;
     final lowerQuery = query.toLowerCase().trim();
-    return ingredients.any(
-      (ingredient) => ingredient.toLowerCase().contains(lowerQuery),
-    );
+    if (ingredients.any((i) => i.toLowerCase().contains(lowerQuery))) return true;
+    return ingredientItems.any((i) => i.name.toLowerCase().contains(lowerQuery));
   }
 
-  /// ใช้ตรวจสอบว่าชื่อสูตรตรงกับคำค้นหาหรือไม่ (ใช้ร่วมกับค้นหาวัตถุดิบ)
   bool matchesNameQuery(String query) {
     if (query.trim().isEmpty) return true;
     return name.toLowerCase().contains(query.toLowerCase().trim());
@@ -62,5 +85,66 @@ class Recipe {
   bool matchesQuery(String query) {
     if (query.trim().isEmpty) return true;
     return matchesNameQuery(query) || matchesIngredientQuery(query);
+  }
+
+  bool matchesDietTag(String tag) => dietTags.contains(tag);
+
+  Recipe copyWith({
+    String? name,
+    String? emoji,
+    String? imageUrl,
+    String? category,
+    int? cookTimeMinutes,
+    int? prepTimeMinutes,
+    String? difficulty,
+    List<String>? ingredients,
+    List<IngredientItem>? ingredientItems,
+    List<String>? steps,
+    String? country,
+    bool? isOfficial,
+    String? uploaderName,
+    double? rating,
+    int? reviewCount,
+    int? servings,
+    String? tips,
+    String? platingTips,
+    NutritionInfo? nutrition,
+    List<String>? dietTags,
+    String? season,
+    DateTime? createdAt,
+    int? viewCount,
+    bool? isRecommended,
+    List<String>? imageUrls,
+    String? videoUrl,
+  }) {
+    return Recipe(
+      id: id,
+      name: name ?? this.name,
+      emoji: emoji ?? this.emoji,
+      imageUrl: imageUrl ?? this.imageUrl,
+      category: category ?? this.category,
+      cookTimeMinutes: cookTimeMinutes ?? this.cookTimeMinutes,
+      prepTimeMinutes: prepTimeMinutes ?? this.prepTimeMinutes,
+      difficulty: difficulty ?? this.difficulty,
+      ingredients: ingredients ?? this.ingredients,
+      ingredientItems: ingredientItems ?? this.ingredientItems,
+      steps: steps ?? this.steps,
+      country: country ?? this.country,
+      isOfficial: isOfficial ?? this.isOfficial,
+      uploaderName: uploaderName ?? this.uploaderName,
+      rating: rating ?? this.rating,
+      reviewCount: reviewCount ?? this.reviewCount,
+      servings: servings ?? this.servings,
+      tips: tips ?? this.tips,
+      platingTips: platingTips ?? this.platingTips,
+      nutrition: nutrition ?? this.nutrition,
+      dietTags: dietTags ?? this.dietTags,
+      season: season ?? this.season,
+      createdAt: createdAt ?? this.createdAt,
+      viewCount: viewCount ?? this.viewCount,
+      isRecommended: isRecommended ?? this.isRecommended,
+      imageUrls: imageUrls ?? this.imageUrls,
+      videoUrl: videoUrl ?? this.videoUrl,
+    );
   }
 }

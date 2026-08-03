@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../theme/app_theme.dart';
-import '../providers/auth_provider.dart';
-import '../providers/theme_provider.dart';
-import 'login_screen.dart';
+import '../../theme/app_theme.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/theme_provider.dart';
+import '../login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -30,8 +30,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _pickImage() async {
-    // หมายเหตุ: image_picker รองรับ Android/iOS/web โดยตรง
-    // สำหรับ Windows desktop อาจต้องใช้แพ็กเกจ file_selector แทน
     final XFile? picked = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
     if (picked == null) return;
     await context.read<AuthProvider>().updateProfile(profileImagePath: picked.path);
@@ -155,14 +153,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = auth.currentUser;
 
     if (user == null) {
-      // โหมด guest — ไม่มีบัญชีให้แสดง
       return Scaffold(
         appBar: AppBar(title: const Text('โปรไฟล์')),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('👤', style: const TextStyle(fontSize: 40)),
+              const Text('👤', style: TextStyle(fontSize: 40)),
               const SizedBox(height: 12),
               Text('คุณกำลังใช้งานแบบผู้เยี่ยมชม', style: TextStyle(color: AppTheme.txtSecondary(context))),
               const SizedBox(height: 20),
@@ -253,7 +250,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 title: Text('โหมดมืด', style: TextStyle(fontSize: 14.5, color: AppTheme.txtPrimary(context))),
                 value: themeProvider.isDarkMode,
-                activeColor: AppTheme.prim(context),
+                activeThumbColor: AppTheme.prim(context),
                 onChanged: (value) => themeProvider.toggleTheme(value),
               ),
             ],
